@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructivo de Onboarding - Asesor Digital</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#0033A0',
+                            dark: '#001A57',
+                            magenta: '#E6007E',
+                            light: '#FF33A1'
+                        },
+                        ui: {
+                            base: '#050B14', /* Un azul muy oscuro casi negro */
+                            surface: '#111827',
+                            elevated: '#1F2937'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Styles & Resets */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #F9FAFB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Presentation Container (16:9 Aspect Ratio) */
+        .presentation-container {
+            width: 100vw;
+            height: 56.25vw; /* 16:9 */
+            max-height: 100vh;
+            max-width: 177.78vh; /* 16:9 */
+            position: relative;
+            background-color: theme('colors.ui.base');
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        /* Slide Control */
+        .slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: scale(0.98);
+            display: flex;
+            flex-direction: column;
+            /* AUMENTAMOS EL PADDING INFERIOR PARA QUE NO CHOQUE CON LOS BOTONES */
+            padding: 4vw 5vw 6.5vw 5vw; 
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* FONDO: Magenta opaco y lo demás azul */
+        .slide:not(#slide-0)::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(230, 0, 126, 0.18) 0%, transparent 60%),
+                        radial-gradient(circle at bottom right, rgba(0, 51, 160, 0.3) 0%, transparent 70%);
+            background-color: theme('colors.ui.base'); /* Azul base super oscuro */
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ANIMACIONES DE ENTRADA */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide.active .animate-up {
+            animation: fadeInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+
+        /* Typography & Utilities */
+        h1, h2, h3, h4, .font-heading { font-family: 'Outfit', sans-serif; }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, theme('colors.brand.blue') 0%, theme('colors.brand.magenta') 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-title {
+            font-size: 2.5vw;
+            font-weight: 700;
+            margin-bottom: 1.5vw;
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1vw;
+        }
+        
+        .slide-title i { color: theme('colors.brand.magenta'); }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 1vw;
+            padding: 1.5vw; /* Reducido un poco para ahorrar espacio */
+        }
+
+        /* Custom UI Elements for Mockups */
+        .mockup-window {
+            background: theme('colors.ui.surface');
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75vw;
+            overflow: hidden;
+            box-shadow: 0 1vw 2vw rgba(0,0,0,0.5);
+        }
+        .mockup-header {
+            background: theme('colors.ui.elevated');
+            padding: 0.5vw 1vw;
+            display: flex;
+            gap: 0.5vw;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .dot { width: 0.7vw; height: 0.7vw; border-radius: 50%; }
+        .dot.r { background: #EF4444; } .dot.y { background: #F59E0B; } .dot.g { background: #10B981; }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: absolute;
+            bottom: 2vw;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5vw;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            width: 3vw;
+            height: 3vw;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2vw;
+            backdrop-filter: blur(5px);
+        }
+        .nav-btn:hover { background: theme('colors.brand.magenta'); border-color: theme('colors.brand.magenta'); }
+        
+        .progress-container {
+            display: flex;
+            gap: 0.4vw;
+        }
+        .progress-dot {
+            width: 0.6vw;
+            height: 0.6vw;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .progress-dot.active {
+            background: theme('colors.brand.magenta');
+            transform: scale(1.3);
+        }
+
+        .arrow-next { color: rgba(255,255,255,0.2); font-size: 2vw; }
+
+        /* Responsive Text Scaling */
+        .text-xl-vw { font-size: 1.1vw; }
+        .text-2xl-vw { font-size: 1.4vw; }
+        .text-3xl-vw { font-size: 1.8vw; }
+        .text-4xl-vw { font-size: 2.2vw; }
+        .text-5xl-vw { font-size: 3.2vw; }
+        .text-6xl-vw { font-size: 4.2vw; }
+        
+        /* Custom scrollbar for NEO mockup */
+        ::-webkit-scrollbar { width: 0.4vw; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 1vw; }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container">
+
+    <!-- SLIDE 1: PORTADA (MAGENTA FUERTE CON LOGOS) -->
+    <div class="slide active" id="slide-0" style="background: linear-gradient(135deg, #E6007E 0%, #B30062 100%);">
+        
+        <!-- Logo Banca Empresas | Banco Guayaquil -->
+        <div class="absolute top-[4vw] left-[4vw] z-20 animate-up">
+            <div class="flex items-center gap-[1.5vw] bg-white px-[2vw] py-[1vw] rounded-full shadow-lg">
+                <!-- Texto Banca Empresas -->
+                <div class="leading-none text-brand-dark">
+                    <div class="text-[1.4vw] font-medium tracking-wide">Banca</div>
+                    <div class="text-[1.6vw] font-bold tracking-wide">Empresas</div>
+                </div>
+                
+                <!-- Divisor -->
+                <div class="w-[0.15vw] h-[3vw] bg-gray-300"></div>
+                
+                <!-- Logo BG -->
+                <div class="flex items-center gap-[0.8vw]">
+                    <svg class="w-[3vw] h-[3vw]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 5C25.147 5 5 25.147 5 50C5 74.853 25.147 95 50 95C74.853 95 95 74.853 95 50" stroke="#E6007E" stroke-width="16" stroke-linecap="round"/>
+                        <path d="M50 25C36.1929 25 25 36.1929 25 50" stroke="#E6007E" stroke-width="12" stroke-linecap="round"/>
+                    </svg>
+                    <div class="leading-none text-brand-magenta">
+                        <div class="text-[1.8vw] font-bold tracking-tight">Banco</div>
+                        <div class="text-[1.8vw] font-bold tracking-tight">Guayaquil</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abstract Tech Background Elements -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute right-[-10%] top-[-10%] w-[50vw] h-[50vw] border-[0.2vw] border-white/10 rounded-full animate-[spin_40s_linear_infinite]"></div>
+            <div class="absolute right-[5%] top-[10%] w-[30vw] h-[30vw] border-[0.1vw] border-white/20 rounded-full animate-[spin_20s_linear_infinite_reverse]"></div>
+        </div>
+
+        <div class="flex flex-col justify-center h-full max-w-[70vw] relative z-10 pl-[4vw] mt-[2vw]">
+            <div class="inline-flex items-center gap-[1vw] bg-white/20 border border-white/30 px-[1.5vw] py-[0.5vw] rounded-full mb-[2vw] w-fit backdrop-blur-sm animate-up delay-1">
+                <i class="fa-solid fa-book-bookmark text-white text-[1vw]"></i>
+                <span class="text-[0.9vw] font-semibold tracking-[0.2em] text-white">PROCEDIMIENTO OPERATIVO</span>
+            </div>
+            
+            <h1 class="text-6xl-vw font-bold leading-[1.1] mb-[1.5vw] text-white animate-up delay-1">
+                Instructivo de <br>
+                <span class="text-white drop-shadow-md border-b-[0.4vw] border-brand-blue pb-[0.5vw]">Onboarding y Vinculación</span> <br>
+                de Proveedores en Confirming
+            </h1>
+            
+            <h2 class="text-3xl-vw font-light text-white/90 border-l-[0.4vw] border-white pl-[1.5vw] mt-[1vw] animate-up delay-2">
+                Guía Visual y Operativa para Asesores Digitales
+            </h2>
+            
+            <div class="mt-[4vw] flex items-center gap-[1vw] text-white/80 text-xl-vw animate-up delay-3">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Versión 4.0 | Documento Interno Controlado</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: ¿QUÉ HACE ESTE INSTRUCTIVO? -->
+    <div class="slide" id="slide-1">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-route"></i> ¿Qué hace este Instructivo?</h2>
+        
+        <div class="flex-grow flex flex-col justify-center animate-up delay-1">
+            <p class="text-2xl-vw text-gray-300 mb-[4vw] max-w-[65vw] text-center mx-auto leading-relaxed">
+                Orienta paso a paso al <strong>Asesor Digital</strong> en la ejecución del proceso completo de vinculación, garantizando control documental, trazabilidad y estandarización.
+            </p>
+            
+            <div class="flex justify-between items-center w-full px-[2vw]">
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center w-[18vw]">
+                    <div class="w-[5.5vw] h-[5.5vw] rounded-full bg-ui-surface border-2 border-brand-blue flex items-center justify-center mb-[1vw] shadow-[0_0_15px_rgba(0,51,160,0.5)]">
+                        <i class="fa-solid fa-envelope-open-text text-2xl-vw text-brand-blue"></i>
+                    </div>
+                    <h3 class="font-bold text-xl-vw mb-[0.5vw]">1. Recepción</h3>
+                    <p class="text-[1vw] text-gray-400">Requerimiento vía correo</p>
+                </div>
+                
+                <i class="fa-solid fa-chevron-right arrow-next"></i>
+                
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center w-[18vw]">
+                    <div class="w-[5.5vw] h-[5.5vw] rounded-full bg-ui-surface border-2 border-brand-magenta flex items-center justify-center mb-[1vw] shadow-[0_0_15px_rgba(230,0,126,0.3)]">
+                        <i class="fa-solid fa-file-shield text-2xl-vw text-brand-magenta"></i>
+                    </div>
+                    <h3 class="font-bold text-xl-vw mb-[0.5vw]">2. Documentación</h3>
+                    <p class="text-[1vw] text-gray-400">Recopilación y Ficha SIB</p>
+                </div>
+
+                <i class="fa-solid fa-chevron-right arrow-next"></i>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center w-[18vw]">
+                    <div class="w-[5.5vw] h-[5.5vw] rounded-full bg-ui-surface border-2 border-brand-blue flex items-center justify-center mb-[1vw] shadow-[0_0_15px_rgba(0,51,160,0.5)]">
+                        <i class="fa-solid fa-server text-2xl-vw text-brand-blue"></i>
+                    </div>
+                    <h3 class="font-bold text-xl-vw mb-[0.5vw]">3. Indexación</h3>
+                    <p class="text-[1vw] text-gray-400">Carga en sistema NEO</p>
+                </div>
+
+                <i class="fa-solid fa-chevron-right arrow-next"></i>
+
+                <!-- Step 4 -->
+                <div class="flex flex-col items-center text-center w-[18vw]">
+                    <div class="w-[5.5vw] h-[5.5vw] rounded-full bg-ui-surface border-2 border-green-500 flex items-center justify-center mb-[1vw] shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                        <i class="fa-solid fa-check-double text-2xl-vw text-green-500"></i>
+                    </div>
+                    <h3 class="font-bold text-xl-vw mb-[0.5vw]">4. Aprobación</h3>
+                    <p class="text-[1vw] text-gray-400">Legal y Capacitación</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: ROLES QUE INTERVIENEN (CORREGIDA SUPERPOSICIÓN) -->
+    <div class="slide" id="slide-2">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-users-gear"></i> Ecosistema de Roles</h2>
+        
+        <!-- Reducido el gap y ajustado el tamaño para evitar superposición con los controles inferiores -->
+        <div class="flex-grow flex flex-col items-center justify-center animate-up delay-1">
+            
+            <!-- Central/Main Role -->
+            <div class="flex justify-center mb-[1.5vw] w-full">
+                <div class="glass-panel w-[30vw] border-brand-magenta text-center relative overflow-hidden py-[1vw]">
+                    <div class="absolute inset-0 bg-brand-magenta opacity-10"></div>
+                    <i class="fa-solid fa-headset text-3xl-vw text-brand-magenta mb-[0.5vw]"></i>
+                    <h3 class="font-bold text-2xl-vw">Asesor Digital</h3>
+                    <p class="text-[1.1vw] text-gray-300 mt-[0.5vw]">Ejecutor central, guía y controlador del proceso.</p>
+                </div>
+            </div>
+
+            <!-- Other Roles Grid (Reducido espacio vertical) -->
+            <div class="grid grid-cols-4 gap-[1vw] w-full px-[2vw] max-w-[90vw]">
+                
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-building-user text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Proveedor</h4>
+                    <span class="text-[0.8vw] text-gray-400">Cliente a vincular</span>
+                </div>
+                
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-user-tie text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Oficial de Crédito</h4>
+                    <span class="text-[0.8vw] text-gray-400">Relación Comercial</span>
+                </div>
+
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-building text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Gran Empresa</h4>
+                    <span class="text-[0.8vw] text-gray-400">Ancla del Confirming</span>
+                </div>
+
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-money-bill-transfer text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Cash Management</h4>
+                    <span class="text-[0.8vw] text-gray-400">Gestión de Producto</span>
+                </div>
+
+                <!-- Spacer for centering -->
+                <div></div>
+
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-shield-halved text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Cumplimiento</h4>
+                    <span class="text-[0.8vw] text-gray-400">Emisión Ficha SIB</span>
+                </div>
+
+                <div class="glass-panel text-center flex flex-col items-center justify-center py-[1vw]">
+                    <i class="fa-solid fa-scale-balanced text-2xl-vw text-brand-blue mb-[0.5vw]"></i>
+                    <h4 class="font-bold text-xl-vw">Área Legal</h4>
+                    <span class="text-[0.8vw] text-gray-400">Revisión de Poderes</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: INICIO DEL PROCESO -->
+    <div class="slide" id="slide-3">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-play"></i> Inicio: Recepción del Requerimiento</h2>
+        
+        <div class="flex-grow flex items-center justify-between gap-[4vw] animate-up delay-1">
+            <div class="w-[45%]">
+                <p class="text-2xl-vw text-gray-300 leading-relaxed mb-[2vw]">
+                    El proceso inicia cuando el Proveedor (que ya tiene relación comercial con la Gran Empresa) es postulado para el servicio.
+                </p>
+                <div class="bg-brand-blue/20 border-l-[0.4vw] border-brand-blue p-[1.5vw] rounded-r-lg">
+                    <p class="text-xl-vw font-semibold text-white mb-[0.5vw]">Buzón Receptor:</p>
+                    <p class="text-xl-vw font-mono text-brand-magenta">atencionempresas@bancoguayaquil.com</p>
+                </div>
+            </div>
+
+            <!-- Email Mockup -->
+            <div class="w-[50%] mockup-window">
+                <div class="mockup-header">
+                    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+                    <span class="ml-[0.5vw] text-[0.9vw] text-gray-500 font-mono">Bandeja Institucional</span>
+                </div>
+                <div class="p-[2vw] bg-[#0F172A] flex flex-col gap-[1vw]">
+                    <div class="flex items-center justify-between border-b border-gray-700 pb-[1vw]">
+                        <div class="flex items-center gap-[1vw]">
+                            <div class="w-[3vw] h-[3vw] bg-brand-magenta rounded-full flex items-center justify-center font-bold text-xl-vw text-white">GE</div>
+                            <div>
+                                <div class="font-bold text-xl-vw">Oficial Gran Empresa</div>
+                                <div class="text-[0.9vw] text-gray-400">Para: Atención Empresas</div>
+                            </div>
+                        </div>
+                        <span class="text-[0.9vw] text-gray-500">09:00 AM</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl-vw mb-[0.5vw]">Asunto: Vinculación Confirming - PROVEEDOR XYZ</h4>
+                        <p class="text-[1vw] text-gray-300 font-light">Estimados Asesores Digitales,<br><br>Solicito iniciar el proceso de vinculación para el proveedor XYZ S.A. asociado a la empresa ancla ABC Corp. Adjunto matriz.</p>
+                    </div>
+                    <div class="mt-[0.5vw] flex gap-[1vw]">
+                        <div class="bg-gray-800 p-[0.5vw] px-[1vw] rounded text-[0.9vw] flex items-center gap-[0.5vw] border border-gray-600"><i class="fa-solid fa-file-excel text-green-500"></i> Matriz_Proveedores.xlsx</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: VERIFICACIÓN INICIAL -->
+    <div class="slide" id="slide-4">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-list-check"></i> Verificación Inicial del Asesor</h2>
+        
+        <div class="flex-grow flex items-center justify-center gap-[4vw] animate-up delay-1">
+            <!-- Traffic Light Indicator -->
+            <div class="w-[15%] flex flex-col items-center bg-ui-surface p-[1.5vw] rounded-full border border-gray-800 shadow-2xl relative shrink-0">
+                <div class="absolute inset-0 rounded-full shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] pointer-events-none"></div>
+                <div class="w-[6vw] h-[6vw] rounded-full bg-green-500/20 border-[0.2vw] border-green-500 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.5)] z-10 mb-[1.5vw]">
+                    <i class="fa-solid fa-check text-3xl-vw text-green-500"></i>
+                </div>
+                <div class="w-[6vw] h-[6vw] rounded-full bg-gray-800 border-[0.2vw] border-gray-700 z-10 mb-[1.5vw]"></div>
+                <div class="w-[6vw] h-[6vw] rounded-full bg-gray-800 border-[0.2vw] border-gray-700 z-10"></div>
+            </div>
+
+            <!-- Checklist -->
+            <div class="w-[75%] glass-panel flex flex-col gap-[1vw]">
+                <h3 class="font-bold text-2xl-vw mb-[0.5vw] text-brand-magenta">Antes de contactar al proveedor, validar:</h3>
+                
+                <div class="flex items-center gap-[1.5vw] bg-gray-800/50 p-[1vw] rounded-[0.5vw] border border-gray-700">
+                    <i class="fa-solid fa-square-check text-2xl-vw text-green-400"></i>
+                    <p class="text-[1.3vw]">Requerimiento recibido al buzón correcto.</p>
+                </div>
+                
+                <div class="flex items-center gap-[1.5vw] bg-gray-800/50 p-[1vw] rounded-[0.5vw] border border-gray-700">
+                    <i class="fa-solid fa-square-check text-2xl-vw text-green-400"></i>
+                    <p class="text-[1.3vw]">La Gran Empresa (ancla) ya tiene el servicio Confirming contratado.</p>
+                </div>
+                
+                <div class="flex items-center gap-[1.5vw] bg-gray-800/50 p-[1vw] rounded-[0.5vw] border border-gray-700">
+                    <i class="fa-solid fa-square-check text-2xl-vw text-green-400"></i>
+                    <p class="text-[1.3vw]">Existe <strong>cupo disponible</strong> en la línea de la Gran Empresa.</p>
+                </div>
+                
+                <div class="flex items-center gap-[1.5vw] bg-gray-800/50 p-[1vw] rounded-[0.5vw] border border-gray-700">
+                    <i class="fa-solid fa-square-check text-2xl-vw text-green-400"></i>
+                    <p class="text-[1.3vw]">El proveedor consta en la matriz o está relacionado comercialmente con la GE.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: CONTACTO TELEFÓNICO -->
+    <div class="slide" id="slide-5">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-phone-volume"></i> Contacto Telefónico al Proveedor</h2>
+        
+        <div class="flex-grow flex items-center justify-between gap-[3vw] animate-up delay-1">
+            <!-- Steps -->
+            <div class="w-[45%] flex flex-col gap-[1.5vw]">
+                <div class="flex items-start gap-[1vw]">
+                    <div class="w-[2.5vw] h-[2.5vw] rounded-full bg-brand-blue flex items-center justify-center font-bold text-white shrink-0 mt-[0.2vw]">1</div>
+                    <div>
+                        <h4 class="font-bold text-xl-vw">Presentación</h4>
+                        <p class="text-[1.1vw] text-gray-400">Explicar qué es Confirming y el beneficio.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-[1vw]">
+                    <div class="w-[2.5vw] h-[2.5vw] rounded-full bg-brand-blue flex items-center justify-center font-bold text-white shrink-0 mt-[0.2vw]">2</div>
+                    <div>
+                        <h4 class="font-bold text-xl-vw">Requisitos</h4>
+                        <p class="text-[1.1vw] text-gray-400">Indicar la documentación que se solicitará por correo.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-[1vw]">
+                    <div class="w-[2.5vw] h-[2.5vw] rounded-full bg-brand-blue flex items-center justify-center font-bold text-white shrink-0 mt-[0.2vw]">3</div>
+                    <div>
+                        <h4 class="font-bold text-xl-vw">Explicar Flujo</h4>
+                        <p class="text-[1.1vw] text-gray-400">Aclarar tiempos de validación y activación.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Script Bubble -->
+            <div class="w-[50%] relative">
+                <div class="absolute -left-[2vw] top-[3vw] text-5xl-vw text-gray-600/50"><i class="fa-solid fa-quote-left"></i></div>
+                <div class="bg-brand-magenta/90 p-[2.5vw] rounded-[1.5vw] rounded-tl-none relative shadow-2xl border border-brand-light/30 backdrop-blur-md">
+                    <p class="text-[1.5vw] font-medium leading-relaxed italic text-white">
+                        "Buenos días, le habla el área de Asesores Digitales de Banco Guayaquil. Le contactamos por la vinculación de su empresa al servicio Confirming con [Nombre de Gran Empresa]. <br><br>
+                        Le enviaremos un correo con los documentos requeridos. Al devolverlos, pasarán por revisión legal para luego enviarle sus credenciales."
+                    </p>
+                </div>
+                <div class="absolute -bottom-[1.5vw] left-[2vw] text-3xl-vw text-brand-magenta"><i class="fa-solid fa-caret-down"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: ENVÍO DEL CORREO -->
+    <div class="slide" id="slide-6">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-paper-plane"></i> Envío de Correo y Requisitos</h2>
+        
+        <div class="flex-grow flex flex-col justify-center items-center animate-up delay-1">
+            
+            <div class="mockup-window w-[80%] h-auto flex flex-col">
+                <div class="mockup-header bg-[#1E293B] border-b border-gray-700">
+                    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+                    <span class="ml-[1vw] text-[1vw] text-gray-400"><i class="fa-solid fa-pen-to-square"></i> Nuevo Mensaje</span>
+                </div>
+                <div class="bg-[#0F172A] p-[2vw] flex flex-col">
+                    <div class="border-b border-gray-700 pb-[0.8vw] mb-[0.8vw] flex items-center">
+                        <span class="text-gray-400 w-[5vw] text-[1.1vw]">Para:</span>
+                        <span class="text-white bg-gray-800 px-[1vw] py-[0.2vw] rounded-full text-[1vw]">contacto@proveedor.com</span>
+                    </div>
+                    <div class="border-b border-gray-700 pb-[0.8vw] mb-[1vw] flex items-center">
+                        <span class="text-gray-400 w-[5vw] text-[1.1vw]">Asunto:</span>
+                        <span class="text-white font-bold text-[1.1vw]">Requisitos Vinculación Confirming Banco Guayaquil</span>
+                    </div>
+                    <div class="text-gray-300 text-[1.1vw]">
+                        <p>Estimado Cliente,<br><br>Adjuntamos los formatos requeridos para su vinculación al servicio Confirming. Por favor completar, firmar y devolver por esta vía.</p>
+                        
+                        <div class="mt-[2vw] flex gap-[1.5vw]">
+                            <!-- Attachment Icons -->
+                            <div class="flex items-center gap-[0.5vw] bg-gray-800 px-[1vw] py-[0.5vw] rounded border border-gray-600">
+                                <i class="fa-solid fa-file-pdf text-red-500 text-[1.5vw]"></i>
+                                <span class="text-[0.9vw] font-bold">Convenio (CV)</span>
+                            </div>
+                            <div class="flex items-center gap-[0.5vw] bg-gray-800 px-[1vw] py-[0.5vw] rounded border border-gray-600">
+                                <i class="fa-solid fa-file-word text-blue-500 text-[1.5vw]"></i>
+                                <span class="text-[0.9vw] font-bold">Anexo 1 (AN)</span>
+                            </div>
+                            <div class="flex items-center gap-[0.5vw] bg-gray-800 px-[1vw] py-[0.5vw] rounded border border-gray-600">
+                                <i class="fa-solid fa-file-excel text-green-500 text-[1.5vw]"></i>
+                                <span class="text-[0.9vw] font-bold">Info Fiscal (IF)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-[2vw] flex justify-end">
+                        <button class="bg-brand-blue hover:bg-blue-600 transition text-white px-[2vw] py-[0.6vw] rounded font-bold text-[1.1vw] flex items-center gap-[0.5vw]"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- SLIDE 8: RECEPCIÓN DE DOCUMENTACIÓN -->
+    <div class="slide" id="slide-7">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-folder-open"></i> Recepción de Documentación</h2>
+        
+        <div class="flex-grow flex items-center justify-center gap-[6vw] animate-up delay-1">
+            
+            <div class="flex flex-col items-center gap-[1vw]">
+                <div class="w-[8vw] h-[8vw] bg-brand-blue/20 rounded-full flex items-center justify-center border border-brand-blue shadow-[0_0_20px_rgba(0,51,160,0.4)]">
+                    <i class="fa-solid fa-cloud-arrow-down text-4xl-vw text-brand-blue"></i>
+                </div>
+                <h3 class="font-bold text-2xl-vw text-center">Recepción<br>Digital</h3>
+            </div>
+            
+            <i class="fa-solid fa-arrow-right-long text-4xl-vw text-gray-500"></i>
+            
+            <div class="glass-panel w-[40vw]">
+                <h4 class="font-bold text-xl-vw mb-[1vw] border-b border-gray-700 pb-[0.5vw] text-brand-magenta">Expediente Esperado:</h4>
+                <ul class="space-y-[1vw] text-[1.2vw]">
+                    <li class="flex items-center justify-between bg-gray-800/40 p-[0.8vw] rounded">
+                        <div class="flex items-center gap-[1vw]"><i class="fa-solid fa-file-signature text-gray-400"></i> Convenios Firmados</div>
+                        <i class="fa-solid fa-circle-check text-green-500 text-[1.5vw]"></i>
+                    </li>
+                    <li class="flex items-center justify-between bg-gray-800/40 p-[0.8vw] rounded">
+                        <div class="flex items-center gap-[1vw]"><i class="fa-solid fa-file-lines text-gray-400"></i> Anexos Completos</div>
+                        <i class="fa-solid fa-circle-check text-green-500 text-[1.5vw]"></i>
+                    </li>
+                    <li class="flex items-center justify-between bg-gray-800/40 p-[0.8vw] rounded">
+                        <div class="flex items-center gap-[1vw]"><i class="fa-solid fa-building-columns text-gray-400"></i> Información Fiscal</div>
+                        <i class="fa-solid fa-circle-check text-green-500 text-[1.5vw]"></i>
+                    </li>
+                    <li class="flex items-center justify-between bg-gray-800/40 p-[0.8vw] rounded">
+                        <div class="flex items-center gap-[1vw]"><i class="fa-solid fa-id-card text-gray-400"></i> Nombramientos / Cédulas</div>
+                        <i class="fa-solid fa-circle-check text-green-500 text-[1.5vw]"></i>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SLIDE 9: VALIDACIÓN Y FICHA SIB -->
+    <div class="slide" id="slide-8">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-magnifying-glass-chart"></i> Validación y Solicitud Ficha SIB</h2>
+        
+        <div class="flex-grow flex items-center justify-center gap-[2vw] animate-up delay-1">
+            
+            <div class="glass-panel w-[45%] h-full">
+                <h3 class="font-bold text-xl-vw mb-[1vw] text-brand-blue"><i class="fa-solid fa-tasks"></i> Control Previo</h3>
+                <ul class="space-y-[0.8vw] text-[1.1vw] text-gray-300">
+                    <li class="flex items-start gap-[1vw] bg-gray-900/50 p-[1vw] rounded border border-gray-700">
+                        <i class="fa-solid fa-eye text-brand-blue mt-[0.2vw]"></i> 
+                        Información fiscal completa y legible.
+                    </li>
+                    <li class="flex items-start gap-[1vw] bg-gray-900/50 p-[1vw] rounded border border-gray-700">
+                        <i class="fa-solid fa-eye text-brand-blue mt-[0.2vw]"></i> 
+                        Datos del correo coinciden con documentos físicos.
+                    </li>
+                    <li class="flex items-start gap-[1vw] bg-gray-900/50 p-[1vw] rounded border border-gray-700">
+                        <i class="fa-solid fa-eye text-brand-blue mt-[0.2vw]"></i> 
+                        Cupo promedio de facturación validado.
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="flex flex-col items-center w-[8%]">
+                <i class="fa-solid fa-arrow-right-arrow-left text-3xl-vw text-brand-magenta"></i>
+                <span class="text-[0.8vw] text-center mt-[0.5vw] font-bold">Solicitud<br>Interna</span>
+            </div>
+
+            <div class="glass-panel w-[45%] h-full border-brand-magenta/50 bg-brand-magenta/5">
+                <h3 class="font-bold text-xl-vw mb-[1vw] text-brand-magenta"><i class="fa-solid fa-id-badge"></i> Emisión Ficha SIB</h3>
+                <p class="text-[1.1vw] mb-[1vw] text-gray-300">
+                    Remitir información a <strong>Cumplimiento</strong> para evaluar el perfil de riesgo del proveedor.
+                </p>
+                <div class="bg-[#090E17] p-[1.5vw] rounded flex items-center justify-between border border-brand-magenta/30 shadow-inner">
+                    <div class="flex items-center gap-[1vw]">
+                        <i class="fa-solid fa-file-invoice text-3xl-vw text-gray-400"></i>
+                        <div>
+                            <div class="font-bold text-[1.1vw]">Reporte SIB - Proveedor XYZ</div>
+                            <div class="text-[0.9vw] text-gray-500">Análisis en proceso...</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-spinner fa-spin text-2xl-vw text-brand-magenta"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SLIDE 10: RESULTADO FICHA SIB -->
+    <div class="slide" id="slide-9">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-code-branch"></i> Resultado Ficha SIB: Decisión</h2>
+        
+        <div class="flex-grow flex flex-col items-center justify-center animate-up delay-1">
+            
+            <!-- Origin -->
+            <div class="bg-gray-800 border-2 border-gray-600 py-[0.8vw] px-[3vw] rounded-lg font-bold text-xl-vw mb-[1.5vw] shadow-lg">
+                Calificación SIB Recibida
+            </div>
+            
+            <!-- Split -->
+            <div class="w-[50vw] border-t-2 border-gray-600 h-[2vw] relative">
+                <div class="absolute -top-[1vw] left-0 w-[0.2vw] h-[3vw] bg-gray-600"></div>
+                <div class="absolute -top-[1vw] right-0 w-[0.2vw] h-[3vw] bg-gray-600"></div>
+                <div class="absolute -top-[1vw] left-[50%] w-[0.2vw] h-[1vw] bg-gray-600"></div>
+            </div>
+
+            <!-- Branches -->
+            <div class="flex w-[60vw] justify-between">
+                
+                <!-- Happy Path -->
+                <div class="w-[45%] flex flex-col items-center">
+                    <div class="flex gap-[1vw] mb-[1.5vw]">
+                        <div class="bg-green-600 px-[1.5vw] py-[0.4vw] rounded-full font-bold text-lg text-white shadow-[0_0_15px_rgba(22,163,74,0.5)]">A1</div>
+                        <div class="bg-green-600 px-[1.5vw] py-[0.4vw] rounded-full font-bold text-lg text-white shadow-[0_0_15px_rgba(22,163,74,0.5)]">A2</div>
+                        <div class="bg-green-600 px-[1.5vw] py-[0.4vw] rounded-full font-bold text-lg text-white shadow-[0_0_15px_rgba(22,163,74,0.5)]">A3</div>
+                    </div>
+                    <div class="glass-panel border-green-500/50 text-center w-full bg-green-900/10">
+                        <i class="fa-solid fa-arrow-down text-2xl-vw text-green-500 mb-[0.5vw]"></i>
+                        <h4 class="font-bold text-xl-vw mb-[0.5vw] text-green-400">Continúa Flujo</h4>
+                        <p class="text-[1vw] text-gray-300">Pasa directamente a etapa de Indexación en NEO.</p>
+                    </div>
+                </div>
+
+                <!-- Exception Path -->
+                <div class="w-[45%] flex flex-col items-center">
+                    <div class="bg-red-600 px-[2vw] py-[0.4vw] rounded-full font-bold text-lg text-white mb-[1.5vw] shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                        Diferente a A1, A2, A3
+                    </div>
+                    <div class="glass-panel border-red-500/50 text-center w-full bg-red-900/10">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl-vw text-red-500 mb-[0.5vw]"></i>
+                        <h4 class="font-bold text-xl-vw mb-[0.5vw] text-red-400">Excepción</h4>
+                        <ul class="text-[1vw] text-gray-300 text-left list-disc pl-[1.5vw] space-y-[0.3vw]">
+                            <li>Informar a Oficial de Cuenta.</li>
+                            <li>Adjuntar evidencia SIB.</li>
+                            <li>Solicitar carta recomendación.</li>
+                            <li>Esperar aprobación.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: INDEXACIÓN EN NEO (CORREGIDA SUPERPOSICIÓN) -->
+    <div class="slide" id="slide-10">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-desktop"></i> Indexación en Sistema NEO</h2>
+        
+        <div class="flex-grow flex gap-[2vw] animate-up delay-1 h-full pb-[1vw]">
+            
+            <!-- Steps Sidebar (Agregado padding bottom interno para scroll) -->
+            <div class="w-[30%] bg-[#0B1120] border border-gray-800 rounded-lg p-[1vw] overflow-y-auto h-full shadow-lg">
+                <div class="pb-[4vw]"> <!-- Wrapper interno con padding para evitar que botones tapen el último texto -->
+                    <h3 class="font-bold text-[1.2vw] mb-[1vw] text-brand-blue border-b border-gray-700 pb-[0.5vw]">Pasos de Indexación</h3>
+                    <ol class="list-decimal pl-[1.5vw] space-y-[0.8vw] text-[1.1vw] text-gray-300">
+                        <li>Ingresar a NEO.</li>
+                        <li>Menú: "Digitalización de doc. varios".</li>
+                        <li>Ingresar RUC y Serv. Confirming.</li>
+                        <li>Validar Empresa y Grabar.</li>
+                        <li>Abrir programa externo de escaneo.</li>
+                        <li><strong class="text-white">Subir individualmente:</strong>
+                            <ul class="list-disc pl-[1vw] text-[0.9vw] text-gray-400 mt-[0.3vw]">
+                                <li>Convenio</li>
+                                <li>Anexo 1</li>
+                                <li>Ficha SIB</li>
+                                <li>Plantilla Proveedor</li>
+                                <li>Carta Excepción (si aplica)</li>
+                            </ul>
+                        </li>
+                        <li>Guardar y esperar 5 min.</li>
+                        <li>Finalizar grabación en NEO.</li>
+                        <li>Generar N° Expediente.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- NEO UI Mockup -->
+            <div class="w-[70%] mockup-window h-full flex flex-col">
+                <div class="bg-[#1e1e1e] border-b border-[#333] px-[1vw] py-[0.5vw] text-[0.9vw] font-mono flex justify-between items-center text-gray-400">
+                    <span>Sistema Central NEO v5.2</span>
+                    <span>Usuario: Asesor_01</span>
+                </div>
+                <div class="bg-[#e5e5e5] flex-grow p-[2vw] text-gray-800 font-sans">
+                    <h4 class="text-[1.5vw] font-bold mb-[1.5vw] text-[#0033A0] border-b-2 border-[#0033A0] pb-[0.5vw]">Digitalización de Documentos Varios</h4>
+                    
+                    <div class="grid grid-cols-2 gap-[2vw] mb-[1.5vw]">
+                        <div>
+                            <label class="block text-[1vw] font-bold mb-[0.2vw]">RUC Proveedor:</label>
+                            <input type="text" value="0999999999001" class="w-full border border-gray-400 p-[0.5vw] text-[1.1vw] bg-white rounded shadow-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-[1vw] font-bold mb-[0.2vw]">Servicio:</label>
+                            <select class="w-full border border-gray-400 p-[0.5vw] text-[1.1vw] bg-white rounded shadow-sm" disabled>
+                                <option>Confirming Proveedor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-300 p-[1vw] rounded mb-[1.5vw] shadow-sm">
+                        <h5 class="font-bold text-[1.1vw] mb-[0.5vw] text-gray-700">Archivos Cargados (Programa Externo)</h5>
+                        <table class="w-full text-left text-[1vw] border-collapse">
+                            <tr class="bg-gray-200">
+                                <th class="p-[0.5vw] border-b border-gray-300">Tipo Documento</th>
+                                <th class="p-[0.5vw] border-b border-gray-300">Estado</th>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-[0.5vw]">CONVENIO.pdf</td>
+                                <td class="p-[0.5vw] text-green-600 font-bold">✔ Subido</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-[0.5vw]">ANEXO_1.pdf</td>
+                                <td class="p-[0.5vw] text-green-600 font-bold">✔ Subido</td>
+                            </tr>
+                            <tr>
+                                <td class="p-[0.5vw]">FICHA_SIB.pdf</td>
+                                <td class="p-[0.5vw] text-green-600 font-bold">✔ Subido</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="flex justify-end gap-[1vw] mt-auto">
+                        <button class="bg-gray-400 text-white px-[1.5vw] py-[0.6vw] rounded font-bold text-[1vw]">Cancelar</button>
+                        <button class="bg-[#0033A0] text-white px-[1.5vw] py-[0.6vw] rounded font-bold text-[1vw]">Grabar y Finalizar</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SLIDE 12: CONTROL POSTERIOR -->
+    <div class="slide" id="slide-11">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-scale-balanced"></i> Control Posterior: Legal y Cash</h2>
+        
+        <div class="flex-grow flex flex-col justify-center gap-[3vw] animate-up delay-1">
+            <p class="text-[1.4vw] text-center text-gray-300">
+                Tras indexar, esperar la confirmación de validación vía correo electrónico.
+            </p>
+
+            <div class="flex justify-center gap-[3vw]">
+                
+                <!-- OK Scenario -->
+                <div class="glass-panel w-[40%] flex flex-col items-center border-t-[0.3vw] border-t-green-500">
+                    <i class="fa-regular fa-envelope-open text-3xl-vw text-green-400 mb-[1vw]"></i>
+                    <h3 class="font-bold text-xl-vw text-white mb-[0.5vw]">"OK Procesado"</h3>
+                    <p class="text-[1.1vw] text-gray-400 text-center mb-[1.5vw]">Poderes válidos y configuración en core bancario exitosa.</p>
+                    <div class="bg-green-900/40 text-green-400 font-bold py-[0.5vw] px-[2vw] rounded-full text-[1vw] border border-green-500/30">
+                        Avanza a Capacitación
+                    </div>
+                </div>
+
+                <!-- Reprocess Scenario -->
+                <div class="glass-panel w-[40%] flex flex-col items-center border-t-[0.3vw] border-t-brand-magenta">
+                    <i class="fa-solid fa-envelope-open-text text-3xl-vw text-brand-magenta mb-[1vw]"></i>
+                    <h3 class="font-bold text-xl-vw text-white mb-[0.5vw]">"Corregir Documentos"</h3>
+                    <p class="text-[1.1vw] text-gray-400 text-center mb-[1.5vw]">Observaciones legales en firmas u omisiones.</p>
+                    
+                    <!-- Reprocess Flow -->
+                    <div class="w-full flex items-center justify-between bg-gray-900/80 p-[0.8vw] rounded text-[0.9vw] text-gray-300 border border-gray-700">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-user-clock text-gray-500 mb-[0.2vw]"></i>
+                            <span class="text-center text-[0.8vw]">Informar<br>Proveedor</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-brand-magenta"></i>
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-file-pen text-gray-500 mb-[0.2vw]"></i>
+                            <span class="text-center text-[0.8vw]">Corregir<br>Docs</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-brand-magenta"></i>
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-server text-gray-500 mb-[0.2vw]"></i>
+                            <span class="text-center text-[0.8vw]">Re-Indexar</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 13: CREDENCIALES Y CAPACITACIÓN -->
+    <div class="slide" id="slide-12">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-handshake"></i> Credenciales y Capacitación</h2>
+        
+        <div class="flex-grow flex items-center justify-between gap-[2vw] animate-up delay-1">
+            
+            <div class="w-[30%] glass-panel flex flex-col items-center text-center">
+                <div class="w-[6vw] h-[6vw] bg-brand-blue/20 rounded-full flex items-center justify-center border border-brand-blue mb-[1vw] shadow-[0_0_15px_rgba(0,51,160,0.3)]">
+                    <i class="fa-solid fa-key text-3xl-vw text-brand-blue"></i>
+                </div>
+                <h3 class="font-bold text-xl-vw mb-[0.5vw]">1. Credenciales</h3>
+                <p class="text-[1vw] text-gray-400">Envío de usuario temporal al correo del proveedor.</p>
+            </div>
+
+            <i class="fa-solid fa-chevron-right text-3xl-vw text-gray-600"></i>
+
+            <div class="w-[30%] glass-panel flex flex-col items-center text-center">
+                <div class="w-[6vw] h-[6vw] bg-brand-magenta/20 rounded-full flex items-center justify-center border border-brand-magenta mb-[1vw] shadow-[0_0_15px_rgba(230,0,126,0.3)]">
+                    <i class="fa-solid fa-chalkboard-user text-3xl-vw text-brand-magenta"></i>
+                </div>
+                <h3 class="font-bold text-xl-vw mb-[0.5vw]">2. Capacitación</h3>
+                <p class="text-[1vw] text-gray-400">Breve sesión de uso de la plataforma transaccional.</p>
+            </div>
+
+            <i class="fa-solid fa-chevron-right text-3xl-vw text-gray-600"></i>
+
+            <div class="w-[30%] glass-panel flex flex-col items-center text-center border-green-500/50 bg-green-900/10">
+                <div class="w-[6vw] h-[6vw] bg-green-500/20 rounded-full flex items-center justify-center border border-green-500 mb-[1vw] shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                    <i class="fa-solid fa-money-bill-wave text-3xl-vw text-green-500"></i>
+                </div>
+                <h3 class="font-bold text-xl-vw mb-[0.5vw] text-green-400">3. Primera Cesión</h3>
+                <p class="text-[1vw] text-gray-400">Primer anticipo de factura. <strong class="text-white">Proceso Cerrado.</strong></p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SLIDE 14: CONTROL Y TRAZABILIDAD -->
+    <div class="slide" id="slide-13">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-clock-rotate-left"></i> Control y Trazabilidad (Bitácora)</h2>
+        
+        <div class="flex-grow flex flex-col justify-center animate-up delay-1">
+            <p class="text-[1.3vw] text-gray-300 mb-[3vw] text-center">
+                Todo expediente debe dejar evidencia documental de sus hitos clave para auditoría.
+            </p>
+
+            <div class="glass-panel w-full p-[2.5vw] relative">
+                <!-- Horizontal Timeline Line -->
+                <div class="absolute top-[50%] left-[5vw] right-[5vw] h-[0.2vw] bg-gray-600 -translate-y-1/2"></div>
+                
+                <div class="flex justify-between relative z-10">
+                    
+                    <!-- Point 1 -->
+                    <div class="flex flex-col items-center w-[15vw]">
+                        <div class="w-[1.5vw] h-[1.5vw] rounded-full bg-brand-blue mb-[1vw] border-[0.3vw] border-[#090E17] shadow-[0_0_0_2px_rgba(0,51,160,1)]"></div>
+                        <div class="text-[0.9vw] text-brand-blue font-bold mb-[0.2vw]">INICIO</div>
+                        <div class="bg-gray-900 p-[0.8vw] rounded text-[0.8vw] text-gray-300 text-center border border-gray-700 w-full shadow-md">
+                            Fecha correo<br>requerimiento
+                        </div>
+                    </div>
+
+                    <!-- Point 2 -->
+                    <div class="flex flex-col items-center w-[15vw]">
+                        <div class="w-[1.5vw] h-[1.5vw] rounded-full bg-brand-magenta mb-[1vw] border-[0.3vw] border-[#090E17] shadow-[0_0_0_2px_rgba(230,0,126,1)]"></div>
+                        <div class="text-[0.9vw] text-brand-magenta font-bold mb-[0.2vw]">RIESGO</div>
+                        <div class="bg-gray-900 p-[0.8vw] rounded text-[0.8vw] text-gray-300 text-center border border-gray-700 w-full shadow-md">
+                            Resultado Ficha SIB<br>(A1/A2/A3 o Excep.)
+                        </div>
+                    </div>
+
+                    <!-- Point 3 -->
+                    <div class="flex flex-col items-center w-[15vw]">
+                        <div class="w-[1.5vw] h-[1.5vw] rounded-full bg-brand-blue mb-[1vw] border-[0.3vw] border-[#090E17] shadow-[0_0_0_2px_rgba(0,51,160,1)]"></div>
+                        <div class="text-[0.9vw] text-brand-blue font-bold mb-[0.2vw]">SISTEMA</div>
+                        <div class="bg-gray-900 p-[0.8vw] rounded text-[0.8vw] text-gray-300 text-center border border-gray-700 w-full shadow-md">
+                            Fecha/Hora de<br>Indexación NEO
+                        </div>
+                    </div>
+
+                    <!-- Point 4 -->
+                    <div class="flex flex-col items-center w-[15vw]">
+                        <div class="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 mb-[1vw] border-[0.3vw] border-[#090E17] shadow-[0_0_0_2px_rgba(16,185,129,1)]"></div>
+                        <div class="text-[0.9vw] text-green-500 font-bold mb-[0.2vw]">APROBACIÓN</div>
+                        <div class="bg-gray-900 p-[0.8vw] rounded text-[0.8vw] text-gray-300 text-center border border-gray-700 w-full shadow-md">
+                            Fecha OK Legal &<br>Capacitación
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 15: MEJORA CONTINUA -->
+    <div class="slide" id="slide-14">
+        <h2 class="slide-title animate-up"><i class="fa-solid fa-arrows-rotate"></i> Enfoque de Mejora Continua</h2>
+        
+        <div class="flex-grow flex items-center justify-center gap-[6vw] animate-up delay-1">
+            
+            <div class="relative w-[20vw] h-[20vw] flex items-center justify-center">
+                <!-- Circular Arrows CSS -->
+                <svg viewBox="0 0 100 100" class="absolute inset-0 w-full h-full animate-[spin_10s_linear_infinite]">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#0033A0" />
+                        </marker>
+                        <marker id="arrowhead-mag" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#E6007E" />
+                        </marker>
+                    </defs>
+                    <path d="M 50 10 A 40 40 0 0 1 90 50" fill="none" stroke="#0033A0" stroke-width="4" marker-end="url(#arrowhead)"/>
+                    <path d="M 90 50 A 40 40 0 0 1 50 90" fill="none" stroke="#E6007E" stroke-width="4" marker-end="url(#arrowhead-mag)"/>
+                    <path d="M 50 90 A 40 40 0 0 1 10 50" fill="none" stroke="#0033A0" stroke-width="4" marker-end="url(#arrowhead)"/>
+                    <path d="M 10 50 A 40 40 0 0 1 50 10" fill="none" stroke="#E6007E" stroke-width="4" marker-end="url(#arrowhead-mag)"/>
+                </svg>
+                <i class="fa-solid fa-file-contract text-5xl-vw text-white relative z-10"></i>
+            </div>
+            
+            <div class="glass-panel w-[40vw]">
+                <h3 class="font-bold text-2xl-vw mb-[1vw] text-white">Estandarización Activa</h3>
+                <p class="text-[1.2vw] text-gray-300 leading-relaxed mb-[1.5vw]">
+                    Este instructivo es un <strong>documento vivo</strong>. Debe actualizarse obligatoriamente cuando cambien:
+                </p>
+                <ul class="grid grid-cols-2 gap-[1vw] text-[1.1vw] text-gray-400">
+                    <li class="flex items-center gap-[1vw]"><i class="fa-solid fa-file-pdf text-brand-magenta"></i> Formatos / Docs</li>
+                    <li class="flex items-center gap-[1vw]"><i class="fa-solid fa-sitemap text-brand-blue"></i> Áreas Involucradas</li>
+                    <li class="flex items-center gap-[1vw]"><i class="fa-solid fa-stopwatch text-brand-magenta"></i> Tiempos (SLA)</li>
+                    <li class="flex items-center gap-[1vw]"><i class="fa-solid fa-desktop text-brand-blue"></i> Sistemas (NEO)</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SLIDE 16: CIERRE -->
+    <div class="slide" id="slide-15" style="background: linear-gradient(135deg, #050B14 0%, #001A57 100%);">
+        
+        <div class="flex-grow flex flex-col items-center justify-center text-center max-w-[80vw] mx-auto animate-up">
+            <i class="fa-solid fa-quote-left text-5xl-vw text-white/10 mb-[2vw]"></i>
+            
+            <h2 class="text-[2.8vw] font-light leading-tight text-white font-heading">
+                "Un proceso <strong class="font-bold text-brand-blue bg-white/10 px-[1vw] rounded">claro</strong>, <strong class="font-bold text-brand-magenta bg-white/10 px-[1vw] rounded">trazable</strong> y bien documentado mejora la calidad del servicio, reduce errores y permite que cualquier empleado pueda ejecutar el proceso correctamente."
+            </h2>
+            
+            <div class="mt-[4vw] bg-white/5 border border-white/20 px-[3vw] py-[1.5vw] rounded-full backdrop-blur-sm shadow-xl">
+                <p class="text-[1.5vw] font-bold tracking-widest text-gray-300">
+                    FIN DEL INSTRUCTIVO
+                </p>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Controls -->
+    <div class="nav-controls">
+        <button class="nav-btn shadow-lg" onclick="prevSlide()" id="btn-prev"><i class="fa-solid fa-arrow-left"></i></button>
+        <div class="progress-container bg-black/40 px-[1vw] py-[0.5vw] rounded-full backdrop-blur-md border border-white/10" id="dots-container">
+            <!-- Dots injected by JS -->
+        </div>
+        <button class="nav-btn shadow-lg" onclick="nextSlide()" id="btn-next"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const dotsContainer = document.getElementById('dots-container');
+
+    // Initialize dots
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('progress-dot');
+        if (i === 0) dot.classList.add('active');
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+    }
+    const dots = document.querySelectorAll('.progress-dot');
+
+    function updateUI() {
+        // Update Slides (Reset animations)
+        slides.forEach((slide, index) => {
+            if (index === currentSlide) {
+                slide.classList.add('active');
+                // Restart animations by removing and re-adding class (optional, but CSS handles initial load well enough here)
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        // Update Dots
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+
+        // Button States
+        document.getElementById('btn-prev').style.opacity = currentSlide === 0 ? '0.3' : '1';
+        document.getElementById('btn-prev').style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+        
+        document.getElementById('btn-next').style.opacity = currentSlide === totalSlides - 1 ? '0.3' : '1';
+        document.getElementById('btn-next').style.pointerEvents = currentSlide === totalSlides - 1 ? 'none' : 'auto';
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateUI();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateUI();
+        }
+    }
+
+    function goToSlide(n) {
+        currentSlide = n;
+        updateUI();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'Space') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    // Initialize UI state
+    updateUI();
+</script>
+
+</body>
+</html>
